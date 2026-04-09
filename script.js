@@ -23,7 +23,7 @@ function calcular() {
   let primer = adesivo;
 
   document.getElementById("resultado").innerHTML =
-    "Juntas: " + juntas +
-    "<br>Adesivo: " + adesivo + " latas" +
-    "<br>Primer: " + primer + " latas";
+    "🔧 Total de juntas: " + juntas +
+    "<br>🧴 Adesivo necessário: " + adesivo + " latas" +
+    "<br>🧪 Primer necessário: " + primer + " latas";
 }
