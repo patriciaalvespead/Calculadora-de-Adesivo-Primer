@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora de Adesivo e Primer</title>
+  <title>Calculadora Técnica de Adesivo e Primer</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -12,21 +13,21 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #eef4ff, #f8fbff);
+      background: linear-gradient(135deg, #eef5ff, #f7fbff);
       color: #1f2937;
     }
 
     .container {
-      max-width: 920px;
-      margin: 40px auto;
+      max-width: 980px;
+      margin: 32px auto;
       background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+      border-radius: 20px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
       overflow: hidden;
     }
 
     .header {
-      background: linear-gradient(135deg, #0f4c81, #2563eb);
+      background: linear-gradient(135deg, #0a2a66, #1d4ed8);
       color: white;
       padding: 28px 32px;
     }
@@ -34,12 +35,13 @@
     .header h1 {
       margin: 0 0 8px;
       font-size: 30px;
+      line-height: 1.2;
     }
 
     .header p {
       margin: 0;
-      opacity: 0.95;
       font-size: 15px;
+      opacity: 0.95;
     }
 
     .content {
@@ -50,12 +52,16 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(240px, 1fr));
       gap: 18px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .field {
       display: flex;
       flex-direction: column;
+    }
+
+    .full {
+      grid-column: 1 / -1;
     }
 
     label {
@@ -66,11 +72,12 @@
     }
 
     input,
-    select {
-      height: 46px;
+    select,
+    textarea {
+      width: 100%;
       border: 1px solid #cbd5e1;
       border-radius: 10px;
-      padding: 0 14px;
+      padding: 12px 14px;
       font-size: 15px;
       background: #fff;
       outline: none;
@@ -78,27 +85,46 @@
     }
 
     input:focus,
-    select:focus {
+    select:focus,
+    textarea:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
     }
 
-    .full {
-      grid-column: 1 / -1;
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .check-row input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      transform: scale(1.1);
     }
 
     .actions {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      margin-top: 6px;
+      margin-top: 4px;
+      margin-bottom: 20px;
     }
 
     button {
-      height: 46px;
       border: none;
       border-radius: 10px;
-      padding: 0 20px;
+      padding: 12px 18px;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
@@ -107,7 +133,7 @@
 
     button:hover {
       transform: translateY(-1px);
-      opacity: 0.96;
+      opacity: 0.97;
     }
 
     .btn-primary {
@@ -120,11 +146,16 @@
       color: #0f172a;
     }
 
+    .btn-success {
+      background: #0f766e;
+      color: white;
+    }
+
     .results {
-      margin-top: 28px;
       display: grid;
-      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      grid-template-columns: repeat(2, minmax(240px, 1fr));
       gap: 16px;
+      margin-top: 8px;
     }
 
     .card {
@@ -151,46 +182,57 @@
 
     .card .desc {
       font-size: 14px;
-      color: #475569;
       line-height: 1.45;
+      color: #475569;
     }
 
-    .info-box {
-      margin-top: 22px;
-      background: #fefce8;
-      border: 1px solid #fde68a;
+    .box {
+      margin-top: 20px;
       border-radius: 12px;
       padding: 16px 18px;
       font-size: 14px;
       line-height: 1.55;
-      color: #713f12;
     }
 
     .formula-box {
-      margin-top: 18px;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 16px 18px;
-      font-size: 14px;
-      line-height: 1.6;
       color: #334155;
     }
 
-    .error {
-      margin-top: 20px;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #991b1b;
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-size: 14px;
+    .info-box {
+      background: #fefce8;
+      border: 1px solid #fde68a;
+      color: #713f12;
+    }
+
+    .warning-box {
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      color: #9a3412;
       display: none;
     }
 
-    @media (max-width: 700px) {
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      display: none;
+    }
+
+    .orcamento-box {
+      margin-top: 20px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 760px) {
       .container {
-        margin: 18px;
+        margin: 16px;
       }
 
       .header,
@@ -202,16 +244,22 @@
       .results {
         grid-template-columns: 1fr;
       }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Calculadora de Adesivo e Primer</h1>
-      <p>
-        Estimativa por bitola, metros lineares e quantidade de conexões, com margem de segurança para evitar falta de material em obra.
-      </p>
+      <h1>Calculadora Técnica de Adesivo e Primer</h1>
+      <p>Patrícia Alves • Soluções em PEAD, PVC-U e CPVC</p>
     </div>
 
     <div class="content">
@@ -220,50 +268,66 @@
           <label for="bitola">Bitola</label>
           <select id="bitola">
             <option value="">Selecione</option>
-            <option value='0.5'>1/2"</option>
-            <option value='0.75'>3/4"</option>
-            <option value='1'>1"</option>
-            <option value='1.25'>1 1/4"</option>
-            <option value='1.5'>1 1/2"</option>
-            <option value='2'>2"</option>
-            <option value='2.5'>2 1/2"</option>
-            <option value='3'>3"</option>
-            <option value='4'>4"</option>
-            <option value='5'>5"</option>
-            <option value='6'>6"</option>
-            <option value='8'>8"</option>
-            <option value='10'>10"</option>
-            <option value='12'>12"</option>
+            <option value="0.5">1/2"</option>
+            <option value="0.75">3/4"</option>
+            <option value="1">1"</option>
+            <option value="1.25">1 1/4"</option>
+            <option value="1.5">1 1/2"</option>
+            <option value="2">2"</option>
+            <option value="2.5">2 1/2"</option>
+            <option value="3">3"</option>
+            <option value="4">4"</option>
+            <option value="5">5"</option>
+            <option value="6">6"</option>
+            <option value="8">8"</option>
+            <option value="10">10"</option>
+            <option value="12">12"</option>
           </select>
         </div>
 
         <div class="field">
+          <label for="barra">Comprimento da barra (m)</label>
+          <input type="number" id="barra" min="0.1" step="0.1" value="6">
+        </div>
+
+        <div class="field">
           <label for="ml">Metros lineares</label>
-          <input type="number" id="ml" min="0" step="0.01" placeholder="Ex.: 38" />
+          <input type="number" id="ml" min="0" step="0.01" placeholder="Ex.: 38">
         </div>
 
         <div class="field">
           <label for="conexoes">Quantidade de conexões</label>
-          <input type="number" id="conexoes" min="0" step="1" placeholder="Ex.: 7" />
+          <input type="number" id="conexoes" min="0" step="1" placeholder="Ex.: 7">
         </div>
 
-        <div class="field">
-          <label for="barra">Comprimento da barra (m)</label>
-          <input type="number" id="barra" min="0.1" step="0.1" value="6" />
+        <div class="field full">
+          <div class="check-row">
+            <input type="checkbox" id="usarJuntas" onchange="toggleJuntas()">
+            <label for="usarJuntas" style="margin: 0; color: #334155;">Já sei o número de juntas</label>
+          </div>
+        </div>
+
+        <div class="field full" id="campoJuntas" style="display: none;">
+          <label for="juntasManual">Total de juntas</label>
+          <input type="number" id="juntasManual" min="0" step="1" placeholder="Ex.: 26">
+          <div class="small">Ao marcar essa opção, a calculadora usa o total de juntas informado e ignora metros lineares e conexões para o cálculo principal.</div>
         </div>
 
         <div class="field full">
           <label for="margem">Margem de segurança (%)</label>
-          <input type="number" id="margem" min="0" step="1" value="30" />
+          <input type="number" id="margem" min="0" step="1" value="30">
         </div>
       </div>
 
       <div class="actions">
         <button class="btn-primary" onclick="calcular()">Calcular</button>
+        <button class="btn-secondary" onclick="gerarTexto()">Gerar texto para orçamento</button>
+        <button class="btn-success" onclick="copiarTexto()">Copiar texto</button>
         <button class="btn-secondary" onclick="limparCampos()">Limpar</button>
       </div>
 
-      <div id="erro" class="error"></div>
+      <div id="erro" class="box error-box"></div>
+      <div id="alertaBitola" class="box warning-box"></div>
 
       <div class="results">
         <div class="card">
@@ -275,7 +339,7 @@
         <div class="card">
           <h3>Total de juntas</h3>
           <div class="value" id="juntasResultado">-</div>
-          <div class="desc">Soma de emendas dos tubos com as conexões informadas.</div>
+          <div class="desc">Soma de emendas com as conexões informadas, ou total manual informado.</div>
         </div>
 
         <div class="card">
@@ -291,20 +355,25 @@
         </div>
       </div>
 
-      <div class="formula-box" id="detalhesCalculo">
+      <div class="box formula-box" id="detalhesCalculo">
         Preencha os campos e clique em <strong>Calcular</strong>.
       </div>
 
-      <div class="info-box">
-        <strong>Importante:</strong> este cálculo é uma estimativa comercial com margem de segurança. O consumo real pode variar conforme aplicação, bitola, técnica do instalador, perdas em campo e quantidade real de conexões.
+      <div class="orcamento-box">
+        <div class="field">
+          <label for="textoOrcamento">Texto para orçamento</label>
+          <textarea id="textoOrcamento" placeholder="Clique em 'Gerar texto para orçamento' para preencher automaticamente."></textarea>
+        </div>
+      </div>
+
+      <div class="box info-box">
+        <strong>Importante:</strong> este cálculo é uma estimativa comercial com margem de segurança. O consumo real pode variar conforme técnica de aplicação, tipo e quantidade real de conexões, perdas em campo e bitola.
       </div>
     </div>
   </div>
 
   <script>
     function obterRendimentoPorBitola(bitola) {
-      // referência prática e conservadora para lata de 473 ml
-      // quanto maior a bitola, menor o rendimento em juntas por lata
       const tabela = {
         0.5: 60,
         0.75: 55,
@@ -343,6 +412,11 @@
       erro.textContent = "";
     }
 
+    function toggleJuntas() {
+      const usarJuntas = document.getElementById("usarJuntas").checked;
+      document.getElementById("campoJuntas").style.display = usarJuntas ? "block" : "none";
+    }
+
     function calcular() {
       esconderErro();
 
@@ -351,24 +425,11 @@
       const conexoes = parseInt(document.getElementById("conexoes").value, 10);
       const barra = parseFloat(document.getElementById("barra").value);
       const margem = parseFloat(document.getElementById("margem").value);
+      const usarJuntas = document.getElementById("usarJuntas").checked;
+      const juntasManual = parseFloat(document.getElementById("juntasManual").value);
 
       if (!bitola) {
         mostrarErro("Selecione a bitola.");
-        return;
-      }
-
-      if (isNaN(ml) || ml <= 0) {
-        mostrarErro("Informe os metros lineares corretamente.");
-        return;
-      }
-
-      if (isNaN(conexoes) || conexoes < 0) {
-        mostrarErro("Informe a quantidade de conexões corretamente.");
-        return;
-      }
-
-      if (isNaN(barra) || barra <= 0) {
-        mostrarErro("Informe o comprimento da barra corretamente.");
         return;
       }
 
@@ -377,52 +438,146 @@
         return;
       }
 
-      const quantidadeBarras = Math.ceil(ml / barra);
-      const emendas = quantidadeBarras > 0 ? quantidadeBarras - 1 : 0;
-      const juntas = emendas + conexoes;
+      if (usarJuntas) {
+        if (isNaN(juntasManual) || juntasManual <= 0) {
+          mostrarErro("Informe corretamente o total de juntas.");
+          return;
+        }
+      } else {
+        if (isNaN(ml) || ml <= 0) {
+          mostrarErro("Informe os metros lineares corretamente.");
+          return;
+        }
+
+        if (isNaN(conexoes) || conexoes < 0) {
+          mostrarErro("Informe a quantidade de conexões corretamente.");
+          return;
+        }
+
+        if (isNaN(barra) || barra <= 0) {
+          mostrarErro("Informe o comprimento da barra corretamente.");
+          return;
+        }
+      }
+
+      let quantidadeBarras = 0;
+      let emendas = 0;
+      let juntas = 0;
+
+      if (usarJuntas) {
+        juntas = juntasManual;
+        emendas = 0;
+        quantidadeBarras = 0;
+      } else {
+        quantidadeBarras = Math.ceil(ml / barra);
+        emendas = quantidadeBarras > 0 ? quantidadeBarras - 1 : 0;
+        juntas = emendas + conexoes;
+      }
 
       const rendimento = obterRendimentoPorBitola(bitola);
+      const consumoBase = juntas / rendimento;
+      const consumoComMargem = consumoBase * (1 + margem / 100);
 
-      const adesivoBase = juntas / rendimento;
-      const adesivoComMargem = adesivoBase * (1 + margem / 100);
-
-      const adesivoFinal = Math.max(1, Math.ceil(adesivoComMargem));
-      const primerFinal = Math.max(1, Math.ceil(adesivoComMargem));
+      const adesivoFinal = Math.max(1, Math.ceil(consumoComMargem));
+      const primerFinal = Math.max(1, Math.ceil(consumoComMargem));
 
       document.getElementById("emendasResultado").textContent = formatarNumero(emendas);
       document.getElementById("juntasResultado").textContent = formatarNumero(juntas);
       document.getElementById("adesivoResultado").textContent = adesivoFinal + " lata(s)";
       document.getElementById("primerResultado").textContent = primerFinal + " lata(s)";
 
-      document.getElementById("detalhesCalculo").innerHTML = `
-        <strong>Detalhes do cálculo:</strong><br>
-        • Bitola selecionada: <strong>${bitola}"</strong><br>
-        • Metros lineares: <strong>${formatarNumero(ml)} m</strong><br>
-        • Comprimento considerado por barra: <strong>${formatarNumero(barra)} m</strong><br>
-        • Quantidade estimada de barras: <strong>${quantidadeBarras}</strong><br>
-        • Emendas entre barras: <strong>${emendas}</strong><br>
-        • Conexões informadas: <strong>${conexoes}</strong><br>
-        • Total de juntas: <strong>${juntas}</strong><br>
-        • Rendimento estimado para ${bitola}": <strong>${rendimento} juntas por lata de 473 ml</strong><br>
-        • Consumo base calculado: <strong>${formatarNumero(adesivoBase)} lata(s)</strong><br>
-        • Margem de segurança aplicada: <strong>${formatarNumero(margem)}%</strong><br>
-        • Resultado final sugerido: <strong>${adesivoFinal} lata(s) de adesivo</strong> e <strong>${primerFinal} lata(s) de primer</strong>
-      `;
+      let detalhes = `<strong>Detalhes do cálculo:</strong><br>`;
+      detalhes += `• Bitola selecionada: <strong>${bitola}"</strong><br>`;
+
+      if (usarJuntas) {
+        detalhes += `• Total de juntas informado manualmente: <strong>${formatarNumero(juntas)}</strong><br>`;
+      } else {
+        detalhes += `• Metros lineares: <strong>${formatarNumero(ml)} m</strong><br>`;
+        detalhes += `• Comprimento considerado por barra: <strong>${formatarNumero(barra)} m</strong><br>`;
+        detalhes += `• Quantidade estimada de barras: <strong>${quantidadeBarras}</strong><br>`;
+        detalhes += `• Emendas entre barras: <strong>${emendas}</strong><br>`;
+        detalhes += `• Conexões informadas: <strong>${conexoes}</strong><br>`;
+        detalhes += `• Total de juntas: <strong>${juntas}</strong><br>`;
+      }
+
+      detalhes += `• Rendimento estimado para ${bitola}": <strong>${rendimento} juntas por lata de 473 ml</strong><br>`;
+      detalhes += `• Consumo base calculado: <strong>${formatarNumero(consumoBase)} lata(s)</strong><br>`;
+      detalhes += `• Margem de segurança aplicada: <strong>${formatarNumero(margem)}%</strong><br>`;
+      detalhes += `• Resultado final sugerido: <strong>${adesivoFinal} lata(s) de adesivo</strong> e <strong>${primerFinal} lata(s) de primer</strong>`;
+
+      document.getElementById("detalhesCalculo").innerHTML = detalhes;
+
+      const alerta = document.getElementById("alertaBitola");
+      if (bitola >= 8) {
+        alerta.style.display = "block";
+        alerta.innerHTML = "⚠️ Atenção: bitolas elevadas possuem maior consumo por junta e exigem maior controle na aplicação.";
+      } else {
+        alerta.style.display = "none";
+        alerta.innerHTML = "";
+      }
+    }
+
+    function gerarTexto() {
+      const bitola = document.getElementById("bitola").value;
+      const juntas = document.getElementById("juntasResultado").textContent;
+      const adesivo = document.getElementById("adesivoResultado").textContent;
+      const primer = document.getElementById("primerResultado").textContent;
+      const margem = document.getElementById("margem").value;
+
+      if (!bitola || juntas === "-" || adesivo === "-" || primer === "-") {
+        mostrarErro("Calcule primeiro antes de gerar o texto para orçamento.");
+        return;
+      }
+
+      esconderErro();
+
+      const texto =
+`Dimensionamento realizado considerando aproximadamente ${juntas} juntas na bitola ${bitola}", com aplicação de margem de segurança de ${margem}% para garantir a execução sem risco de falta de material em obra.
+
+Sugestão de fornecimento:
+- Adesivo: ${adesivo}
+- Primer: ${primer}`;
+
+      document.getElementById("textoOrcamento").value = texto;
+    }
+
+    function copiarTexto() {
+      const campo = document.getElementById("textoOrcamento");
+
+      if (!campo.value.trim()) {
+        mostrarErro("Gere o texto para orçamento antes de copiar.");
+        return;
+      }
+
+      campo.select();
+      campo.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      esconderErro();
+      alert("Texto copiado com sucesso.");
     }
 
     function limparCampos() {
       document.getElementById("bitola").value = "";
+      document.getElementById("barra").value = "6";
       document.getElementById("ml").value = "";
       document.getElementById("conexoes").value = "";
-      document.getElementById("barra").value = "6";
       document.getElementById("margem").value = "30";
+      document.getElementById("usarJuntas").checked = false;
+      document.getElementById("juntasManual").value = "";
+      document.getElementById("campoJuntas").style.display = "none";
 
       document.getElementById("emendasResultado").textContent = "-";
       document.getElementById("juntasResultado").textContent = "-";
       document.getElementById("adesivoResultado").textContent = "-";
       document.getElementById("primerResultado").textContent = "-";
+      document.getElementById("textoOrcamento").value = "";
+
       document.getElementById("detalhesCalculo").innerHTML =
         'Preencha os campos e clique em <strong>Calcular</strong>.';
+
+      document.getElementById("alertaBitola").style.display = "none";
+      document.getElementById("alertaBitola").innerHTML = "";
+
       esconderErro();
     }
   </script>
