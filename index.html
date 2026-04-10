@@ -322,7 +322,6 @@
       .linktree-btn,
       #whatsappBtn,
       .actions,
-      #textoOrcamento,
       .section-title:nth-of-type(2),
       #historico {
         display: none !important;
@@ -414,7 +413,16 @@
         <button class="btn-secondary" onclick="gerarTexto()">Gerar texto para orçamento</button>
         <button class="btn-success" onclick="copiarTexto()">Copiar texto</button>
         <button class="btn-pdf" onclick="exportarPdf()">Exportar em PDF</button>
-        <a id="whatsappBtn" class="whatsapp-link" href="#" target="_blank">Falar no WhatsApp</a>
+
+        <a
+          href="https://wa.me/5519978212800?text=Olá%2C%20usei%20sua%20calculadora%20de%20adesivo%20e%20primer%20e%20gostaria%20de%20validar%20o%20dimensionamento%20para%20minha%20obra."
+          class="whatsapp-link"
+          id="whatsappBtn"
+          target="_blank"
+        >
+          Falar no WhatsApp
+        </a>
+
         <button class="btn-secondary" onclick="limparCampos()">Limpar</button>
       </div>
 
@@ -472,15 +480,6 @@
   </a>
 
   <script>
-    <a href="https://wa.me/5519978212800?text=Olá%2C%20usei%20sua%20calculadora%20e%20quero%20falar%20sobre%20o%20dimensionamento." target="_blank" class="whatsapp-link">
-Falar no WhatsApp
-</a>
-
-    function configurarWhatsapp() {
-      const botao = document.getElementById("whatsappBtn");
-      botao.href = whatsappLink;
-    }
-
     function obterRendimentoPorBitola(bitola) {
       const tabela = {
         0.5: 60,
@@ -498,7 +497,6 @@ Falar no WhatsApp
         10: 4,
         12: 3
       };
-
       return tabela[bitola] || 15;
     }
 
@@ -530,7 +528,7 @@ Falar no WhatsApp
 
       const bitola = parseFloat(document.getElementById("bitola").value);
       const ml = parseFloat(document.getElementById("ml").value);
-      const conexoes = parseInt(document.getElementById("conexoes").value, 10);
+      const conexoes = parseFloat(document.getElementById("conexoes").value);
       const barra = parseFloat(document.getElementById("barra").value);
       const margem = parseFloat(document.getElementById("margem").value);
       const usarJuntas = document.getElementById("usarJuntas").checked;
@@ -546,11 +544,16 @@ Falar no WhatsApp
         return;
       }
 
+      let quantidadeBarras = 0;
+      let emendas = 0;
+      let juntas = 0;
+
       if (usarJuntas) {
         if (isNaN(juntasManual) || juntasManual <= 0) {
           mostrarErro("Informe corretamente o total de juntas.");
           return;
         }
+        juntas = juntasManual;
       } else {
         if (isNaN(ml) || ml <= 0) {
           mostrarErro("Informe os metros lineares corretamente.");
@@ -566,17 +569,7 @@ Falar no WhatsApp
           mostrarErro("Informe o comprimento da barra corretamente.");
           return;
         }
-      }
 
-      let quantidadeBarras = 0;
-      let emendas = 0;
-      let juntas = 0;
-
-      if (usarJuntas) {
-        juntas = juntasManual;
-        emendas = 0;
-        quantidadeBarras = 0;
-      } else {
         quantidadeBarras = Math.ceil(ml / barra);
         emendas = quantidadeBarras > 0 ? quantidadeBarras - 1 : 0;
         juntas = emendas + conexoes;
@@ -675,10 +668,8 @@ Sugestão de fornecimento:
     function adicionarAoHistorico(item) {
       const historicoAtual = JSON.parse(localStorage.getItem("historicoCalculadoraPrimer")) || [];
       historicoAtual.unshift(item);
-
       const historicoLimitado = historicoAtual.slice(0, 10);
       localStorage.setItem("historicoCalculadoraPrimer", JSON.stringify(historicoLimitado));
-
       renderizarHistorico();
     }
 
@@ -728,7 +719,6 @@ Sugestão de fornecimento:
       window.print();
     }
 
-    configurarWhatsapp();
     renderizarHistorico();
   </script>
 </body>
