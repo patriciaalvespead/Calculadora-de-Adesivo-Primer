@@ -385,13 +385,13 @@
         <div class="field">
           <label for="conexoes">Quantidade de conexões</label>
           <input type="number" id="conexoes" min="0" step="1" placeholder="Ex.: 7">
-          <div class="small">Informe a quantidade de peças de conexão, não as juntas.</div>
+          <div class="small">Informe a quantidade de peças de conexão, não o número de juntas.</div>
         </div>
 
         <div class="field">
           <label for="juntasPorConexao">Juntas por conexão</label>
-          <input type="number" id="juntasPorConexao" min="1" step="1" value="2">
-          <div class="small">Regra prática: luva, joelho e tê costumam ter 2 juntas. Ajuste se souber o número real.</div>
+          <input type="number" id="juntasPorConexao" min="0" step="0.5" value="2">
+          <div class="small">Regra prática: luva e joelho costumam ter 2; tê pode ter até 3. Ajuste se souber o número real.</div>
         </div>
 
         <div class="field full">
@@ -409,9 +409,17 @@
           </div>
         </div>
 
-        <div class="field full">
-          <label for="margem">Margem de segurança (%)</label>
+        <div class="field">
+          <label for="margem">Margem de segurança do adesivo (%)</label>
           <input type="number" id="margem" min="0" step="1" value="30">
+        </div>
+
+        <div class="field">
+          <label for="fatorPrimer">Primer em relação ao adesivo (%)</label>
+          <input type="number" id="fatorPrimer" min="10" max="100" step="5" value="50">
+          <div class="small">
+            Regra prática: primer costuma consumir menos que adesivo. Use 40% a 70% conforme condição de campo.
+          </div>
         </div>
       </div>
 
@@ -446,7 +454,7 @@
         <div class="card">
           <h3>Total de juntas</h3>
           <div class="value" id="juntasResultado">-</div>
-          <div class="desc">Emendas entre barras + juntas geradas pelas conexões, ou total manual informado.</div>
+          <div class="desc">Soma de emendas com as conexões informadas, ou total manual informado.</div>
         </div>
 
         <div class="card">
@@ -458,7 +466,7 @@
         <div class="card">
           <h3>Primer</h3>
           <div class="value" id="primerResultado">-</div>
-          <div class="desc">Quantidade estimada de latas de 473 ml, acompanhando o adesivo.</div>
+          <div class="desc">Quantidade estimada de latas de 473 ml, calculada como percentual do consumo de adesivo.</div>
         </div>
       </div>
 
@@ -477,7 +485,7 @@
       </div>
 
       <div class="box info-box">
-        <strong>Importante:</strong> este cálculo é uma estimativa comercial com margem de segurança. Tubos não devem ser tratados automaticamente como 2 juntas por barra; o consumo deve considerar emendas reais entre barras e interfaces tubo + conexão. O consumo real pode variar conforme técnica de aplicação, perdas em campo, folgas, temperatura, condição da superfície e bitola.
+        <strong>Importante:</strong> este cálculo é uma estimativa comercial com margem de segurança. O consumo real pode variar conforme técnica de aplicação, quantidade real de juntas, tipo de conexão, perdas em campo, folgas, temperatura e bitola. O primer não foi considerado igual ao adesivo; ele é calculado por percentual ajustável.
       </div>
     </div>
   </div>
@@ -539,6 +547,7 @@
       const juntasPorConexao = parseFloat(document.getElementById("juntasPorConexao").value);
       const barra = parseFloat(document.getElementById("barra").value);
       const margem = parseFloat(document.getElementById("margem").value);
+      const fatorPrimer = parseFloat(document.getElementById("fatorPrimer").value);
       const usarJuntas = document.getElementById("usarJuntas").checked;
       const juntasManual = parseFloat(document.getElementById("juntasManual").value);
 
@@ -548,7 +557,12 @@
       }
 
       if (isNaN(margem) || margem < 0) {
-        mostrarErro("Informe a margem de segurança corretamente.");
+        mostrarErro("Informe a margem de segurança do adesivo corretamente.");
+        return;
+      }
+
+      if (isNaN(fatorPrimer) || fatorPrimer <= 0 || fatorPrimer > 100) {
+        mostrarErro("Informe o percentual de primer corretamente. Sugestão: entre 40% e 70%.");
         return;
       }
 
@@ -574,7 +588,7 @@
           return;
         }
 
-        if (isNaN(juntasPorConexao) || juntasPorConexao <= 0) {
+        if (isNaN(juntasPorConexao) || juntasPorConexao < 0) {
           mostrarErro("Informe corretamente a quantidade de juntas por conexão.");
           return;
         }
@@ -585,24 +599,22 @@
         }
 
         quantidadeBarras = Math.ceil(ml / barra);
-
-        // Emendas entre barras: não trate tubo como se cada barra gerasse 2 juntas automaticamente.
-        // A emenda só existe quando uma barra precisa ser unida à próxima.
         emendas = quantidadeBarras > 0 ? quantidadeBarras - 1 : 0;
-
-        // Conexões: o consumo ocorre nas interfaces tubo + conexão.
-        // Por padrão, consideramos 2 juntas por conexão, mas o usuário pode ajustar.
         juntasConexoes = conexoes * juntasPorConexao;
-
         juntas = emendas + juntasConexoes;
       }
 
       const rendimento = obterRendimentoPorBitola(bitola);
-      const consumoBase = juntas / rendimento;
-      const consumoComMargem = consumoBase * (1 + margem / 100);
 
-      const adesivoFinal = Math.max(1, Math.ceil(consumoComMargem));
-      const primerFinal = Math.max(1, Math.ceil(consumoComMargem));
+      // Adesivo: rendimento em juntas por lata de 473 ml.
+      const adesivoBaseLatas = juntas / rendimento;
+      const adesivoComMargem = adesivoBaseLatas * (1 + margem / 100);
+      const adesivoFinal = Math.max(1, Math.ceil(adesivoComMargem));
+
+      // Primer: calculado como percentual do consumo de adesivo, não como consumo igual.
+      const primerBaseLatas = adesivoBaseLatas * (fatorPrimer / 100);
+      const primerComMargem = primerBaseLatas * (1 + margem / 100);
+      const primerFinal = Math.max(1, Math.ceil(primerComMargem));
 
       document.getElementById("emendasResultado").textContent = formatarNumero(emendas);
       document.getElementById("juntasResultado").textContent = formatarNumero(juntas);
@@ -620,14 +632,16 @@
         detalhes += `• Quantidade estimada de barras: <strong>${quantidadeBarras}</strong><br>`;
         detalhes += `• Emendas entre barras: <strong>${emendas}</strong><br>`;
         detalhes += `• Conexões informadas: <strong>${conexoes}</strong><br>`;
-        detalhes += `• Juntas por conexão consideradas: <strong>${juntasPorConexao}</strong><br>`;
+        detalhes += `• Juntas por conexão: <strong>${formatarNumero(juntasPorConexao)}</strong><br>`;
         detalhes += `• Juntas geradas pelas conexões: <strong>${formatarNumero(juntasConexoes)}</strong><br>`;
         detalhes += `• Total de juntas: <strong>${formatarNumero(juntas)}</strong><br>`;
       }
 
       detalhes += `• Rendimento estimado para ${bitola}": <strong>${rendimento} juntas por lata de 473 ml</strong><br>`;
-      detalhes += `• Consumo base calculado: <strong>${formatarNumero(consumoBase)} lata(s)</strong><br>`;
-      detalhes += `• Margem de segurança aplicada: <strong>${formatarNumero(margem)}%</strong><br>`;
+      detalhes += `• Consumo base de adesivo: <strong>${formatarNumero(adesivoBaseLatas)} lata(s)</strong><br>`;
+      detalhes += `• Margem de segurança aplicada ao adesivo: <strong>${formatarNumero(margem)}%</strong><br>`;
+      detalhes += `• Primer considerado: <strong>${formatarNumero(fatorPrimer)}% do consumo de adesivo</strong><br>`;
+      detalhes += `• Consumo base de primer: <strong>${formatarNumero(primerBaseLatas)} lata(s)</strong><br>`;
       detalhes += `• Resultado final sugerido: <strong>${adesivoFinal} lata(s) de adesivo</strong> e <strong>${primerFinal} lata(s) de primer</strong>`;
 
       document.getElementById("detalhesCalculo").innerHTML = detalhes;
@@ -656,6 +670,7 @@
       const adesivo = document.getElementById("adesivoResultado").textContent;
       const primer = document.getElementById("primerResultado").textContent;
       const margem = document.getElementById("margem").value;
+      const fatorPrimer = document.getElementById("fatorPrimer").value;
 
       if (!bitola || juntas === "-" || adesivo === "-" || primer === "-") {
         mostrarErro("Calcule primeiro antes de gerar o texto para orçamento.");
@@ -665,7 +680,7 @@
       esconderErro();
 
       const texto =
-`Dimensionamento realizado considerando aproximadamente ${juntas} juntas na bitola ${bitola}", com aplicação de margem de segurança de ${margem}%. O cálculo considera juntas reais de aplicação, evitando tratar cada barra de tubo como se gerasse duas juntas automaticamente.
+`Dimensionamento realizado considerando aproximadamente ${juntas} juntas na bitola ${bitola}", com aplicação de margem de segurança de ${margem}% no adesivo. O primer foi estimado em ${fatorPrimer}% do consumo de adesivo.
 
 Sugestão de fornecimento:
 - Adesivo: ${adesivo}
@@ -721,6 +736,7 @@ Sugestão de fornecimento:
       document.getElementById("conexoes").value = "";
       document.getElementById("juntasPorConexao").value = "2";
       document.getElementById("margem").value = "30";
+      document.getElementById("fatorPrimer").value = "50";
       document.getElementById("usarJuntas").checked = false;
       document.getElementById("juntasManual").value = "";
       document.getElementById("campoJuntas").style.display = "none";
