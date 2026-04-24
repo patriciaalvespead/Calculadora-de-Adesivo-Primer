@@ -385,6 +385,13 @@
         <div class="field">
           <label for="conexoes">Quantidade de conexões</label>
           <input type="number" id="conexoes" min="0" step="1" placeholder="Ex.: 7">
+          <div class="small">Informe a quantidade de peças de conexão, não as juntas.</div>
+        </div>
+
+        <div class="field">
+          <label for="juntasPorConexao">Juntas por conexão</label>
+          <input type="number" id="juntasPorConexao" min="1" step="1" value="2">
+          <div class="small">Regra prática: luva, joelho e tê costumam ter 2 juntas. Ajuste se souber o número real.</div>
         </div>
 
         <div class="field full">
@@ -439,7 +446,7 @@
         <div class="card">
           <h3>Total de juntas</h3>
           <div class="value" id="juntasResultado">-</div>
-          <div class="desc">Soma de emendas com as conexões informadas, ou total manual informado.</div>
+          <div class="desc">Emendas entre barras + juntas geradas pelas conexões, ou total manual informado.</div>
         </div>
 
         <div class="card">
@@ -470,7 +477,7 @@
       </div>
 
       <div class="box info-box">
-        <strong>Importante:</strong> este cálculo é uma estimativa comercial com margem de segurança. O consumo real pode variar conforme técnica de aplicação, quantidade real de conexões, perdas em campo e bitola.
+        <strong>Importante:</strong> este cálculo é uma estimativa comercial com margem de segurança. Tubos não devem ser tratados automaticamente como 2 juntas por barra; o consumo deve considerar emendas reais entre barras e interfaces tubo + conexão. O consumo real pode variar conforme técnica de aplicação, perdas em campo, folgas, temperatura, condição da superfície e bitola.
       </div>
     </div>
   </div>
@@ -529,6 +536,7 @@
       const bitola = parseFloat(document.getElementById("bitola").value);
       const ml = parseFloat(document.getElementById("ml").value);
       const conexoes = parseFloat(document.getElementById("conexoes").value);
+      const juntasPorConexao = parseFloat(document.getElementById("juntasPorConexao").value);
       const barra = parseFloat(document.getElementById("barra").value);
       const margem = parseFloat(document.getElementById("margem").value);
       const usarJuntas = document.getElementById("usarJuntas").checked;
@@ -546,6 +554,7 @@
 
       let quantidadeBarras = 0;
       let emendas = 0;
+      let juntasConexoes = 0;
       let juntas = 0;
 
       if (usarJuntas) {
@@ -565,14 +574,27 @@
           return;
         }
 
+        if (isNaN(juntasPorConexao) || juntasPorConexao <= 0) {
+          mostrarErro("Informe corretamente a quantidade de juntas por conexão.");
+          return;
+        }
+
         if (isNaN(barra) || barra <= 0) {
           mostrarErro("Informe o comprimento da barra corretamente.");
           return;
         }
 
         quantidadeBarras = Math.ceil(ml / barra);
+
+        // Emendas entre barras: não trate tubo como se cada barra gerasse 2 juntas automaticamente.
+        // A emenda só existe quando uma barra precisa ser unida à próxima.
         emendas = quantidadeBarras > 0 ? quantidadeBarras - 1 : 0;
-        juntas = emendas + conexoes;
+
+        // Conexões: o consumo ocorre nas interfaces tubo + conexão.
+        // Por padrão, consideramos 2 juntas por conexão, mas o usuário pode ajustar.
+        juntasConexoes = conexoes * juntasPorConexao;
+
+        juntas = emendas + juntasConexoes;
       }
 
       const rendimento = obterRendimentoPorBitola(bitola);
@@ -598,7 +620,9 @@
         detalhes += `• Quantidade estimada de barras: <strong>${quantidadeBarras}</strong><br>`;
         detalhes += `• Emendas entre barras: <strong>${emendas}</strong><br>`;
         detalhes += `• Conexões informadas: <strong>${conexoes}</strong><br>`;
-        detalhes += `• Total de juntas: <strong>${juntas}</strong><br>`;
+        detalhes += `• Juntas por conexão consideradas: <strong>${juntasPorConexao}</strong><br>`;
+        detalhes += `• Juntas geradas pelas conexões: <strong>${formatarNumero(juntasConexoes)}</strong><br>`;
+        detalhes += `• Total de juntas: <strong>${formatarNumero(juntas)}</strong><br>`;
       }
 
       detalhes += `• Rendimento estimado para ${bitola}": <strong>${rendimento} juntas por lata de 473 ml</strong><br>`;
@@ -641,7 +665,7 @@
       esconderErro();
 
       const texto =
-`Dimensionamento realizado considerando aproximadamente ${juntas} juntas na bitola ${bitola}", com aplicação de margem de segurança de ${margem}% para garantir a execução sem risco de falta de material em obra.
+`Dimensionamento realizado considerando aproximadamente ${juntas} juntas na bitola ${bitola}", com aplicação de margem de segurança de ${margem}%. O cálculo considera juntas reais de aplicação, evitando tratar cada barra de tubo como se gerasse duas juntas automaticamente.
 
 Sugestão de fornecimento:
 - Adesivo: ${adesivo}
@@ -695,6 +719,7 @@ Sugestão de fornecimento:
       document.getElementById("barra").value = "6";
       document.getElementById("ml").value = "";
       document.getElementById("conexoes").value = "";
+      document.getElementById("juntasPorConexao").value = "2";
       document.getElementById("margem").value = "30";
       document.getElementById("usarJuntas").checked = false;
       document.getElementById("juntasManual").value = "";
