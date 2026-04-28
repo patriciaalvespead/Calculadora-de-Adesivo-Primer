@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora Técnica de Adesivo e Primer</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#eef5ff,#f7fbff);color:#1f2937}
+    .container{max-width:1180px;margin:28px auto;background:#fff;border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.08);overflow:hidden}
+    .header{background:linear-gradient(135deg,#0a2a66,#1d4ed8);color:#fff;padding:28px 32px}
+    .header h1{margin:0 0 8px;font-size:30px;line-height:1.15}
+    .header p{margin:0;font-size:15px;opacity:.96;line-height:1.5}
+    .content{padding:28px 32px 36px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:16px;margin-bottom:18px}
+    .field{display:flex;flex-direction:column}
+    .full{grid-column:1/-1}
+    label{font-weight:700;margin-bottom:8px;font-size:14px;color:#1e3a8a}
+    input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:11px 12px;font-size:15px;background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+    input:focus,select:focus,textarea:focus{border-color:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+    textarea{min-height:130px;resize:vertical}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 20px}
+    button,.whatsapp-link{border:0;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s,opacity .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+    button:hover,.whatsapp-link:hover,.linktree-btn:hover{transform:translateY(-1px);opacity:.97}
+    .btn-primary{background:#2563eb;color:#fff}
+    .btn-secondary{background:#e2e8f0;color:#0f172a}
+    .btn-success{background:#0f766e;color:#fff}
+    .btn-pdf{background:#7c3aed;color:#fff}
+    .btn-danger{background:#fee2e2;color:#991b1b;padding:9px 12px}
+    .whatsapp-link{background:#16a34a;color:#fff}
+    .table-wrap{overflow-x:auto;border:1px solid #dbeafe;border-radius:14px}
+    table{width:100%;border-collapse:collapse;min-width:980px}
+    th{background:#eff6ff;color:#1e40af;font-size:13px;text-align:left;padding:12px;white-space:nowrap}
+    td{border-top:1px solid #e2e8f0;padding:10px;vertical-align:top}
+    td input,td select{padding:9px 10px;font-size:14px;border-radius:8px}
+    .readonly{background:#f8fafc;color:#334155;font-weight:700}
+    .results{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:16px;margin-top:20px}
+    .card{background:#f8fbff;border:1px solid #dbeafe;border-radius:14px;padding:18px}
+    .card h3{margin:0 0 10px;font-size:13px;color:#1e40af;text-transform:uppercase;letter-spacing:.4px}
+    .card .value{font-size:28px;font-weight:800;color:#111827;margin-bottom:6px}
+    .card .desc{font-size:14px;line-height:1.45;color:#475569}
+    .box{margin-top:20px;border-radius:12px;padding:16px 18px;font-size:14px;line-height:1.55}
+    .formula-box{background:#f8fafc;border:1px solid #e2e8f0;color:#334155}
+    .info-box{background:#fefce8;border:1px solid #fde68a;color:#713f12}
+    .warning-box{background:#fff7ed;border:1px solid #fdba74;color:#9a3412;display:none}
+    .error-box{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;display:none}
+    .section-title{margin-top:28px;margin-bottom:12px;font-size:18px;color:#0f172a;font-weight:800}
+    .small{font-size:13px;color:#64748b;margin-top:6px}
+    .linktree-btn{position:fixed;right:20px;bottom:20px;background:linear-gradient(135deg,#0a2a66,#1d4ed8);color:#fff;padding:12px 18px;border-radius:30px;font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,.2);z-index:999;transition:transform .2s}
+    @media(max-width:920px){.container{margin:14px}.header,.content{padding:20px 18px}.grid,.results{grid-template-columns:1fr}.actions{flex-direction:column}button,.whatsapp-link{width:100%}}
+    @media print{.linktree-btn,#whatsappBtn,.actions,.btn-danger,#textoOrcamento{display:none!important}body{background:#fff}.container{box-shadow:none;margin:0;max-width:100%}}
+  </style>
+</head>
+<body>
+  <div class="container" id="areaPdf">
+    <div class="header">
+      <h1>Calculadora Técnica de Adesivo e Primer</h1>
+      <p>Estimativa por juntas reais de solda química em PVC-U e CPVC.<br>Não conte tubo e conexão separadamente na mesma interface: cada encaixe colado vale 1 junta.</p>
+    </div>
+
+    <div class="content">
+      <div class="grid">
+        <div class="field">
+          <label for="sistema">Sistema</label>
+          <select id="sistema" onchange="calcular()">
+            <option value="PVC-U">PVC-U — Adesivo AW5125</option>
+            <option value="CPVC">CPVC — Adesivo AW8125</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="modoCalculo">Modo de cálculo</label>
+          <select id="modoCalculo" onchange="calcular()">
+            <option value="conexoes">Conexões informadas</option>
+            <option value="sistema">Sistema completo / pontos soldáveis</option>
+          </select>
+          <div class="small">Use “Conexões informadas” para calcular pelas peças. Use “Sistema completo” quando quiser validar pontas soldáveis.</div>
+        </div>
+
+        <div class="field">
+          <label for="margem">Margem de segurança (%)</label>
+          <input type="number" id="margem" min="0" step="1" value="10" oninput="calcular()">
+        </div>
+
+        <div class="field">
+          <label for="primerPercentual">Primer em relação ao adesivo (%)</label>
+          <input type="number" id="primerPercentual" min="0" step="1" value="50" oninput="calcular()">
+          <div class="small">Padrão: 50%. Ajuste se houver excesso, reaplicação ou superfície muito crítica.</div>
+        </div>
+      </div>
+
+      <div class="box info-box">
+        <strong>Critério correto:</strong> cada encaixe colado conta apenas uma vez. Ex.: uma luva costuma gerar 2 juntas; um joelho, 2; um tê, 3; uma redução soldável, 2; adaptador roscável geralmente só usa adesivo no lado soldável. Flanges parafusadas e itens roscados não entram como solda química.
+      </div>
+
+      <div class="section-title">Itens de solda</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo de peça / trecho</th>
+              <th>Diâmetro</th>
+              <th>Qtd.</th>
+              <th id="thJuntas">Juntas/peça</th>
+              <th id="thTotal">Total juntas</th>
+              <th>Adesivo (ml)</th>
+              <th>Primer (ml)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="linhasItens"></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="adicionarLinha()">+ Adicionar item</button>
+        <button class="btn-secondary" onclick="adicionarExemplo()">Preencher exemplo 8&quot;</button>
+        <button class="btn-secondary" onclick="limparItens()">Limpar</button>
+        <button class="btn-success" onclick="copiarResumo()">Copiar resumo</button>
+        <button class="btn-pdf" onclick="exportarPdf()">Exportar em PDF</button>
+        <a href="https://wa.me/5519978212800?text=Olá%2C%20usei%20sua%20calculadora%20de%20adesivo%20e%20primer%20e%20gostaria%20de%20validar%20o%20dimensionamento%20para%20minha%20obra." class="whatsapp-link" id="whatsappBtn" target="_blank">Falar no WhatsApp</a>
+      </div>
+
+      <div id="erro" class="box error-box"></div>
+      <div id="alertaDuplicidade" class="box warning-box"></div>
+      <div id="alertaSistema" class="box warning-box"></div>
+      <div id="alertaBitola" class="box warning-box"></div>
+
+      <div class="results">
+        <div class="card">
+          <h3>Total de juntas</h3>
+          <div class="value" id="juntasResultado">0</div>
+          <div class="desc">Soma das interfaces realmente coladas.</div>
+        </div>
+        <div class="card">
+          <h3>Adesivo 473 ml</h3>
+          <div class="value" id="adesivoLatas">0 lata(s)</div>
+          <div class="desc" id="adesivoMl">Estimativa com margem: 0 ml</div>
+        </div>
+        <div class="card">
+          <h3>Primer 473 ml</h3>
+          <div class="value" id="primerLatas">0 lata(s)</div>
+          <div class="desc" id="primerMl">Estimativa com margem: 0 ml</div>
+        </div>
+        <div class="card">
+          <h3>Total geral</h3>
+          <div class="value" id="totalLatas">0 lata(s)</div>
+          <div class="desc">Adesivo + primer</div>
+        </div>
+      </div>
+
+      <div class="box formula-box" id="detalhesCalculo">Adicione os itens, informe quantidade e juntas/pontos por peça. O cálculo será atualizado automaticamente.</div>
+
+      <div class="section-title">Texto para orçamento</div>
+      <div class="field">
+        <textarea id="textoOrcamento" placeholder="Clique em 'Copiar resumo' para gerar o texto."></textarea>
+      </div>
+
+      <div class="box info-box">
+        <strong>Importante:</strong> estimativa comercial. O consumo real varia por folga de encaixe, técnica de aplicação, temperatura, reaplicação, desperdício e condição da superfície.
+      </div>
+    </div>
+  </div>
+
+  <a href="https://linktr.ee/patriciasilva_pead" target="_blank" class="linktree-btn">📲 Contato e portfólio</a>
+
+<script>
+const ML_POR_JUNTA_ADESIVO={"0.5":3.7,"0.75":5,"1":7,"1.25":9.5,"1.5":12,"2":16,"2.5":23,"3":31,"4":54,"5":75,"6":105,"8":189.2,"10":295,"12":425};
+const BITOLAS=[["0.5",'1/2"'],["0.75",'3/4"'],["1",'1"'],["1.25",'1 1/4"'],["1.5",'1 1/2"'],["2",'2"'],["2.5",'2 1/2"'],["3",'3"'],["4",'4"'],["5",'5"'],["6",'6"'],["8",'8"'],["10",'10"'],["12",'12"']];
+const TIPOS=[["custom","Item soldável"],["tubo","Tubo / barra"],["luva","Luva"],["joelho90","Joelho 90°"],["joelho45","Joelho 45°"],["te","Tê"],["reducao","Redução soldável"],["adaptador","Adaptador soldável/roscável"],["emenda","Emenda entre barras"],["tampao","Tampão soldável"],["manual","Juntas manuais"]];
+
+// No modo conexões: representa juntas por peça.
+const JUNTAS_PADRAO={custom:2,tubo:2,luva:2,joelho90:2,joelho45:2,te:3,reducao:2,adaptador:1,emenda:1,tampao:1,manual:1};
+
+// No modo sistema completo: representa pontos/pontas soldáveis por peça.
+// Junta real = encontro de duas pontas soldáveis. Por isso, no modo sistema, a calculadora divide os pontos por 2.
+const PONTOS_PADRAO={custom:2,tubo:2,luva:2,joelho90:2,joelho45:2,te:3,reducao:2,adaptador:1,emenda:2,tampao:1,manual:2};
+
+function formatarNumero(v,c=0){return Number(v).toLocaleString("pt-BR",{maximumFractionDigits:c,minimumFractionDigits:c})}
+function mostrarErro(msg){const e=document.getElementById("erro");e.style.display="block";e.textContent=msg}
+function esconderErro(){const e=document.getElementById("erro");e.style.display="none";e.textContent=""}
+function optionsBitola(a="8"){return BITOLAS.map(([v,t])=>`<option value="${v}" ${v===a?"selected":""}>${t}</option>`).join("")}
+function optionsTipo(a="custom"){return TIPOS.map(([v,t])=>`<option value="${v}" ${v===a?"selected":""}>${t}</option>`).join("")}
+function getModo(){return document.getElementById("modoCalculo").value}
+function getRotuloCampo(){return getModo()==="sistema"?"Pontos soldáveis/peça":"Juntas/peça"}
+function getRotuloTotal(){return getModo()==="sistema"?"Total pontos":"Total juntas"}
+function getValorPadrao(tipo){return getModo()==="sistema"?(PONTOS_PADRAO[tipo]??2):(JUNTAS_PADRAO[tipo]??2)}
+
+function atualizarCabecalhos(){
+  document.getElementById("thJuntas").textContent=getRotuloCampo();
+  document.getElementById("thTotal").textContent=getRotuloTotal();
+}
+
+function adicionarLinha(d={}){
+  const tb=document.getElementById("linhasItens");
+  const tr=document.createElement("tr");
+  const tipo=d.tipo||"custom";
+  const bitola=d.bitola||"8";
+  const qtd=d.qtd??"";
+  const valor=d.juntasPorPeca??d.pontosPorPeca??getValorPadrao(tipo);
+  tr.innerHTML=`
+    <td><select class="tipo" onchange="atualizarValorPadrao(this);calcular();">${optionsTipo(tipo)}</select></td>
+    <td><select class="bitola" onchange="calcular();">${optionsBitola(bitola)}</select></td>
+    <td><input type="number" class="qtd" min="0" step="1" value="${qtd}" oninput="calcular();"></td>
+    <td><input type="number" class="juntasPorPeca" min="0" step="0.5" value="${valor}" oninput="calcular();"></td>
+    <td><input type="text" class="totalJuntas readonly" readonly value="0"></td>
+    <td><input type="text" class="adesivoMlLinha readonly" readonly value="0"></td>
+    <td><input type="text" class="primerMlLinha readonly" readonly value="0"></td>
+    <td><button class="btn-danger" onclick="removerLinha(this)">Remover</button></td>`;
+  tb.appendChild(tr);
+  calcular();
+}
+
+function atualizarValorPadrao(s){
+  const tr=s.closest("tr");
+  const tipo=s.value;
+  tr.querySelector(".juntasPorPeca").value=getValorPadrao(tipo);
+}
+
+function removerLinha(b){b.closest("tr").remove();calcular()}
+
+function limparItens(){
+  document.getElementById("linhasItens").innerHTML="";
+  document.getElementById("textoOrcamento").value="";
+  esconderErro();
+  calcular();
+}
+
+function adicionarExemplo(){
+  limparItens();
+  adicionarLinha({tipo:"te",bitola:"8",qtd:46,juntasPorPeca:getValorPadrao("te")});
+  adicionarLinha({tipo:"reducao",bitola:"8",qtd:114,juntasPorPeca:getValorPadrao("reducao")});
+  adicionarLinha({tipo:"luva",bitola:"8",qtd:65,juntasPorPeca:getValorPadrao("luva")});
+  adicionarLinha({tipo:"joelho90",bitola:"8",qtd:15,juntasPorPeca:getValorPadrao("joelho90")});
+  adicionarLinha({tipo:"joelho45",bitola:"8",qtd:8,juntasPorPeca:getValorPadrao("joelho45")});
+  adicionarLinha({tipo:"emenda",bitola:"8",qtd:69,juntasPorPeca:getValorPadrao("emenda")});
+}
+
+function calcular(){
+  esconderErro();
+  atualizarCabecalhos();
+
+  const modo=getModo();
+  const margem=parseFloat(document.getElementById("margem").value);
+  const primerPct=parseFloat(document.getElementById("primerPercentual").value);
+
+  if(isNaN(margem)||margem<0){mostrarErro("Informe a margem de segurança corretamente.");return}
+  if(isNaN(primerPct)||primerPct<0){mostrarErro("Informe corretamente o percentual de primer.");return}
+
+  let totalJuntas=0;
+  let totalPontos=0;
+  let adesivoBaseMl=0;
+  let temBitolaGrande=false;
+  let det=[];
+  let temConexao=false;
+  let temTuboOuEmenda=false;
+  let pontosPorBitola={};
+  let juntasPorBitola={};
+
+  document.querySelectorAll("#linhasItens tr").forEach(tr=>{
+    const tipo=tr.querySelector(".tipo").value;
+    const tipoTxt=tr.querySelector(".tipo").selectedOptions[0].textContent;
+    const bitola=tr.querySelector(".bitola").value;
+    const bitolaTxt=tr.querySelector(".bitola").selectedOptions[0].textContent;
+    const qtd=parseFloat(tr.querySelector(".qtd").value)||0;
+    const valor=parseFloat(tr.querySelector(".juntasPorPeca").value)||0;
+    const mlJunta=ML_POR_JUNTA_ADESIVO[bitola]||0;
+
+    let totalLinha=0;
+    let juntasLinha=0;
+
+    if(modo==="sistema"){
+      // valor = pontos soldáveis por peça
+      const pontosLinha=qtd*valor;
+      totalLinha=pontosLinha;
+      juntasLinha=pontosLinha/2;
+      totalPontos+=pontosLinha;
+      pontosPorBitola[bitola]=(pontosPorBitola[bitola]||0)+pontosLinha;
+    }else{
+      // valor = juntas por peça
+      juntasLinha=qtd*valor;
+      totalLinha=juntasLinha;
+    }
+
+    totalJuntas+=juntasLinha;
+    juntasPorBitola[bitola]=(juntasPorBitola[bitola]||0)+juntasLinha;
+
+    const adesivoLinha=juntasLinha*mlJunta;
+    const primerLinha=adesivoLinha*(primerPct/100);
+    adesivoBaseMl+=adesivoLinha;
+
+    tr.querySelector(".totalJuntas").value=formatarNumero(totalLinha,0);
+    tr.querySelector(".adesivoMlLinha").value=formatarNumero(adesivoLinha,0)+" ml";
+    tr.querySelector(".primerMlLinha").value=formatarNumero(primerLinha,0)+" ml";
+
+    if(parseFloat(bitola)>=8&&juntasLinha>0)temBitolaGrande=true;
+
+    if(qtd>0&&valor>0){
+      if(modo==="sistema"){
+        det.push(`${tipoTxt} ${bitolaTxt}: ${qtd} peça(s) × ${valor} ponto(s) = ${formatarNumero(totalLinha,0)} ponto(s) ≈ ${formatarNumero(juntasLinha,1)} junta(s)`);
+      }else{
+        det.push(`${tipoTxt} ${bitolaTxt}: ${qtd} peça(s) × ${valor} junta(s) = ${formatarNumero(juntasLinha,0)} junta(s)`);
+      }
+    }
+
+    // Alerta de possível duplicidade no modo por conexões.
+    // Emenda entre barras pode ser legítima, mas se a pessoa coloca tubo/barra + conexões sem critério, o cálculo pode inflar.
+    if(qtd>0){
+      if(["luva","joelho90","joelho45","te","reducao","adaptador","tampao","custom"].includes(tipo) && valor>0){temConexao=true}
+      if(["tubo","emenda"].includes(tipo)){temTuboOuEmenda=true}
+    }
+  });
+
+  const fator=1+margem/100;
+  const adesivoMl=adesivoBaseMl*fator;
+  const primerMl=adesivoMl*(primerPct/100);
+  const adesivoLatas=adesivoMl>0?Math.ceil(adesivoMl/473):0;
+  const primerLatas=primerMl>0?Math.ceil(primerMl/473):0;
+
+  document.getElementById("juntasResultado").textContent=formatarNumero(totalJuntas,modo==="sistema"?1:0);
+  document.getElementById("adesivoLatas").textContent=adesivoLatas+" lata(s)";
+  document.getElementById("primerLatas").textContent=primerLatas+" lata(s)";
+  document.getElementById("totalLatas").textContent=adesivoLatas+primerLatas+" lata(s)";
+  document.getElementById("adesivoMl").textContent="Estimativa com margem: "+formatarNumero(adesivoMl,0)+" ml";
+  document.getElementById("primerMl").textContent="Estimativa com margem: "+formatarNumero(primerMl,0)+" ml";
+
+  let detalhes=`<strong>Detalhes do cálculo:</strong><br>• Sistema: <strong>${document.getElementById("sistema").value}</strong><br>• Modo: <strong>${modo==="sistema"?"Sistema completo / pontos soldáveis":"Conexões informadas"}</strong><br>`;
+  if(modo==="sistema"){
+    detalhes+=`• Total de pontos soldáveis: <strong>${formatarNumero(totalPontos,0)}</strong><br>`;
+  }
+  detalhes+=`• Total de juntas reais: <strong>${formatarNumero(totalJuntas,modo==="sistema"?1:0)}</strong><br>• Adesivo base: <strong>${formatarNumero(adesivoBaseMl,0)} ml</strong><br>• Margem aplicada: <strong>${formatarNumero(margem,0)}%</strong><br>• Primer considerado: <strong>${formatarNumero(primerPct,0)}% do adesivo</strong><br>`+(det.length?`• Itens:<br>– ${det.join("<br>– ")}`:`• Nenhum item informado.`);
+  document.getElementById("detalhesCalculo").innerHTML=detalhes;
+
+  const alertaDuplicidade=document.getElementById("alertaDuplicidade");
+  if(modo==="conexoes" && temConexao && temTuboOuEmenda){
+    alertaDuplicidade.style.display="block";
+    alertaDuplicidade.innerHTML=`⚠️ <strong>Possível duplicidade de juntas detectada.</strong><br><br>
+    Você informou conexões e também tubos/emendas. Isso pode estar correto apenas quando as emendas representam uniões reais entre barras.<br><br>
+    👉 Para evitar erro: use as conexões como base principal e considere tubos somente quando houver emenda real entre barras. Não some “2 juntas por tubo” se essas pontas já entram nas conexões.`;
+  }else{
+    alertaDuplicidade.style.display="none";
+    alertaDuplicidade.innerHTML="";
+  }
+
+  const alertaSistema=document.getElementById("alertaSistema");
+  if(modo==="sistema" && totalPontos>0){
+    const inconsistencias=[];
+    Object.keys(pontosPorBitola).forEach(bitola=>{
+      if(pontosPorBitola[bitola] % 2 !== 0){
+        const nomeBitola=(BITOLAS.find(b=>b[0]===bitola)||[bitola,bitola])[1];
+        inconsistencias.push(`${nomeBitola}: ${formatarNumero(pontosPorBitola[bitola],0)} ponto(s)`);
+      }
+    });
+
+    if(inconsistencias.length){
+      alertaSistema.style.display="block";
+      alertaSistema.innerHTML=`⚠️ <strong>Sistema com pontos ímpares por bitola.</strong><br><br>
+      Em um sistema fechado, cada junta une duas pontas soldáveis. Se uma bitola ficou com número ímpar de pontos, pode existir extremidade aberta, tampão, adaptador, flange, mudança de diâmetro ou preenchimento incompleto.<br><br>
+      Verifique: ${inconsistencias.join(" | ")}`;
+    }else{
+      alertaSistema.style.display="none";
+      alertaSistema.innerHTML="";
+    }
+  }else{
+    alertaSistema.style.display="none";
+    alertaSistema.innerHTML="";
+  }
+
+  const alerta=document.getElementById("alertaBitola");
+  if(temBitolaGrande){
+    alerta.style.display="block";
+    alerta.innerHTML='⚠️ Atenção: em 8&quot; ou superior, pequenas variações de aplicação, folga, temperatura e reaplicação alteram muito o consumo. Valide o número de juntas reais antes de fechar o orçamento.';
+  }else{
+    alerta.style.display="none";
+    alerta.innerHTML="";
+  }
+}
+
+function copiarResumo(){
+  calcular();
+  const sistema=document.getElementById("sistema").value;
+  const modo=getModo()==="sistema"?"Sistema completo / pontos soldáveis":"Conexões informadas";
+  const margem=document.getElementById("margem").value;
+  const juntas=document.getElementById("juntasResultado").textContent;
+  const adesivo=document.getElementById("adesivoLatas").textContent;
+  const primer=document.getElementById("primerLatas").textContent;
+  const adesivoMl=document.getElementById("adesivoMl").textContent.replace("Estimativa com margem: ","");
+  const primerMl=document.getElementById("primerMl").textContent.replace("Estimativa com margem: ","");
+  const texto=`Dimensionamento estimado de consumo para solda química em ${sistema}.\n\nCritério utilizado:\n- Modo de cálculo: ${modo}\n- Cálculo por juntas reais de solda, evitando duplicar tubo e conexão na mesma interface.\n- Total estimado de juntas: ${juntas}\n- Margem de segurança: ${margem}%\n\nSugestão de fornecimento:\n- Adesivo: ${adesivo} (${adesivoMl})\n- Primer: ${primer} (${primerMl})\n\nObservação: estimativa comercial. O consumo real pode variar conforme bitola, folga de encaixe, técnica de aplicação, condição da superfície e perdas em campo.`;
+  document.getElementById("textoOrcamento").value=texto;
+  if(navigator.clipboard){navigator.clipboard.writeText(texto).then(()=>alert("Resumo copiado com sucesso."))}
+  else{document.getElementById("textoOrcamento").select();document.execCommand("copy");alert("Resumo copiado com sucesso.")}
+}
+
+function exportarPdf(){window.print()}
+
+adicionarLinha({tipo:"custom",bitola:"8",qtd:"",juntasPorPeca:2});
+calcular();
+</script>
+</body>
+</html>
